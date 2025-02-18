@@ -27,19 +27,29 @@ class Knihovna:
     def z_csv(cls, soubor: str) -> Knihovna:
         """
         Načte data knihovny ze souboru CSV.
-        """
-        with open(soubor, mode="r", encoding="utf-8") as f:
-            reader = csv.reader(f)
-            nazev = next(reader)[0]
-            knihovna = cls(nazev)
-            knihovna.knihy = [Kniha(*radek) for radek in reader]
-        return knihovna
 
-    def pridej_knihu(self, kniha: Kniha):
+        Args:
+            soubor: Cesta k souboru CSV.
+        Returns:
+            Objekt Knihovna načtený ze souboru.
         """
-        Přidá knihu do knihovny.
-        """
-        self.knihy.append(kniha)
+        with open(soubor, newline='', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            prvni_radek = next(reader)
+            nazev_knihovny = prvni_radek[0].split(":")[1].strip()
+
+            knihovna = cls(nazev_knihovny)
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['typ'] == 'kniha':
+                    knihovna.pridej_knihu(
+                        Kniha(row['nazev'], row['autor'], int(row['rok_vydani']), row['isbn'])
+                    )
+                elif row['typ'] == 'ctenar':
+                    knihovna.registruj_ctenare(
+                        Ctenar(row['jmeno'], row['prijmeni'])
+                    )
+        return knihovna
 
     @kniha_existuje
     def odeber_knihu(self, isbn: str):
@@ -80,15 +90,12 @@ class Knihovna:
             if klicova_slovo.lower() in f"{ctenar.jmeno} {ctenar.prijmeni}".lower()
             or (cislo_prukazky and ctenar.cislo_prukazky == cislo_prukazky)
         ]
-
+#to-do fix
     @kniha_existuje
     def vypujc_knihu(self, isbn: str, ctenar: Ctenar):
-        """
-        Vypůjčí knihu čtenáři.
-        """
         if isbn in self.vypujcene_knihy:
-            raise ValueError("Tato kniha je již vypůjčena.")
-        self.vypujcene_knihy[isbn] = (ctenar, datetime.datetime.now())
+            raise ValueError(f"Kniha s ISBN {isbn} je již vypůjčena.")
+        self.vypujcene_knihy[isbn] = (ctenar, datetime.date.today())
 
     @kniha_existuje
     def vrat_knihu(self, isbn: str, ctenar: Ctenar):
