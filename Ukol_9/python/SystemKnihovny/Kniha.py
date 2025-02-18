@@ -3,8 +3,7 @@ class Kniha:
         self._nazev = nazev
         self._autor = autor
         self._rok_vydani = rok_vydani
-        self._isbn = None
-        self.isbn = isbn  # Validace při inicializaci
+        self.isbn = isbn  # Setter validuje ISBN
 
     @property
     def nazev(self) -> str:
@@ -23,10 +22,11 @@ class Kniha:
         return self._isbn
 
     @isbn.setter
-    def isbn(self, hodnota: str):
-        if not (hodnota.isdigit() and len(hodnota) == 13):
-            raise ValueError("ISBN musí mít formát ISBN-13 (13 číslic).")
-        self._isbn = hodnota
+    def isbn(self, isbn: str):
+        if len(isbn) == 13 and isbn.isdigit():
+            self._isbn = isbn
+        else:
+            raise ValueError("ISBN musí mít 13 číslic.")
 
     def __str__(self) -> str:
-        return f"{self.nazev} od {self.autor}, vydáno {self.rok_vydani}, ISBN: {self.isbn}"
+        return f"{self.nazev} od {self.autor} ({self.rok_vydani}) [ISBN: {self.isbn}]"
