@@ -3,7 +3,7 @@
 #define MASOZRAVEC_H
 
 #include "Zvire.h"
-
+//Zjevení
 class Masozravec : public Zvire {
 public:
     Masozravec(int x, int y, Prostredi* prostredi);
